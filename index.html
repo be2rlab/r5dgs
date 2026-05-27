@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>R5DGS: Semantic-Aware 4D Gaussian Splatting with Rigid Body Constraints</title>
+  <meta name="description" content="R5DGS extends physics-informed 4D Gaussian Splatting with instance-level semantics and rigid-body constrained extrapolation, achieving 11 FPS speedup for dynamic scene reconstruction.">
+  <meta name="keywords" content="4D Gaussian Splatting, semantic segmentation, rigid body constraints, dynamic scene reconstruction, open-vocabulary grounding">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- JSON-LD ScholarlyArticle -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "R5DGS: Semantic-Aware 4D Gaussian Splatting with Rigid Body Constraints for Efficient Dynamic Scene Reconstruction",
+    "description": "We extend physics-informed 4D Gaussian Splatting with instance-level semantics and rigid-body constrained extrapolation, achieving a consistent ~11 FPS speedup on NVIDIA RTX 4090 while preserving physically plausible motion.",
+    "author": [
+      {"@type": "Person", "name": "Denis Gridusov", "affiliation": "ITMO University"},
+      {"@type": "Person", "name": "Maxim Popov", "affiliation": "ITMO University"},
+      {"@type": "Person", "name": "Sergey Kolyubin", "affiliation": "ITMO University"}
+    ],
+    "datePublished": "2025",
+    "identifier": "arXiv:2605.25909",
+    "sameAs": "https://arxiv.org/abs/2605.25909"
+  }
+  </script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===== Nav ===== -->
+  <nav>
+    <div class="container">
+      <span class="nav-brand">R5DGS</span>
+      <ul class="nav-links">
+        <li><a href="#abstract">Abstract</a></li>
+        <li><a href="#method">Method</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#bibtex">BibTeX</a></li>
+        <!-- <li><a href="#related">Related</a></li> -->
+        <li>
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">&#9681;</button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===== Hero ===== -->
+  <header class="hero" id="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="venue-badge">ICRA 2026 Workshop on Semantics for Reliable Robot Autonomy</div>
+        <h1>R5DGS: Semantic-Aware 4D Gaussian Splatting<br>with Rigid Body Constraints for Efficient Dynamic Scene Reconstruction</h1>
+        <p class="hero-authors">
+          <span>Denis Gridusov, Maxim Popov, Sergey Kolyubin</span>
+          <span class="affiliation">BE2R Lab, ITMO University</span>
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://arxiv.org/abs/2605.25909" target="_blank" rel="noopener">arXiv</a>
+          <a class="btn btn-outline" href="https://github.com/be2rlab/r5dgs">Code (coming soon)</a>
+          <a class="btn btn-outline" href="https://arxiv.org/pdf/2605.25909">PDF</a>
+        </div>
+      </div>
+      <figure class="hero-teaser">
+        <img src="images/hero_teaser.png"
+             alt="Scene examples from the Dynamic Indoor Scene dataset with R5DGS reconstructions across Dining Table, Chessboard, Darkroom, and Factory scenes"
+             loading="lazy">
+        <figcaption>R5DGS reconstruction across four Dynamic Indoor Scene environments. Each column shows a different scene with R5DGS rendered RGB (top) and semantic segmentation (bottom).</figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <!-- ===== Abstract ===== -->
+  <section class="section" id="abstract">
+    <div class="container">
+      <div class="section-header">
+        <h2>Abstract</h2>
+      </div>
+      <div class="abstract-grid">
+        <div class="abstract-text">
+          <p>
+            We present R5DGS, a framework that extends physics-informed 4D Gaussian Splatting
+            with instance-level semantics and rigid-body constrained extrapolation for efficient
+            dynamic scene reconstruction. Our method augments each Gaussian with a compact
+            learnable identity vector, enabling discrete object grouping without 3D annotations.
+          </p>
+          <blockquote>
+            By restricting dynamics prediction to representative Gaussians per object
+            (typically 9-12) rather than the full set (~40,000), we achieve a consistent
+            <strong>~11 FPS speedup</strong> during extrapolation on <strong>NVIDIA RTX 4090</strong>
+            while preserving physically plausible motion trajectories.
+          </blockquote>
+          <p>
+            Additionally, we construct an offline CLIP-based lookup table that enables
+            open-vocabulary object retrieval from natural language prompts, supporting
+            selective rendering and scene editing without retraining.
+          </p>
+        </div>
+        <div class="stats-card">
+          <h3>Key Results</h3>
+          <div class="stat-row">
+            <span class="stat-label">FPS Speedup</span>
+            <span class="stat-value">+11 FPS</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Inference Complexity</span>
+            <span class="stat-value">O(N) &rarr; O(K)</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Representatives / Scene</span>
+            <span class="stat-value">9-12</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">mIoU (Overall)</span>
+            <span class="stat-value">0.59</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Open-Vocab. Retrieval</span>
+            <span class="stat-value">CLIP-based</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Method ===== -->
+  <section class="section" id="method">
+    <div class="container">
+      <div class="section-header">
+        <h2>Method</h2>
+        <p class="text-secondary">R5DGS builds on TRACE with identity-augmented Gaussians, rigid-body constrained extrapolation, and a CLIP-based open-vocabulary retrieval pipeline.</p>
+      </div>
+
+      <figure class="pipeline-figure">
+        <img src="images/pipeline.png"
+             alt="R5DGS pipeline: multi-view video to identity-augmented 4D Gaussians through rigid-body extrapolation"
+             loading="lazy">
+        <figcaption>R5DGS pipeline overview. Multi-view RGB videos are represented as identity-augmented 4D Gaussians. Identity encoding guided by SAM2+DEVA semantic masks. Rigid-body extrapolation propagates dynamics from representative Gaussians (9-12 per object) to the full set, reducing inference cost from O(N) to O(K).</figcaption>
+      </figure>
+
+      <div class="contrib-grid">
+        <div class="contrib-card">
+          <div class="contrib-number">C1</div>
+          <h3>Identity-Augmented Gaussians</h3>
+          <p>
+            Each 3D Gaussian is augmented with a learnable 16-dimensional identity vector
+            that is alpha-blended during rendering. A lightweight classifier supervised by
+            SAM2+DEVA masks enables discrete object grouping without any 3D annotations.
+          </p>
+          <span class="contrib-tag">semantic grouping</span>
+        </div>
+
+        <div class="contrib-card">
+          <div class="contrib-number">C2</div>
+          <h3>Rigid-Body Extrapolation</h3>
+          <p>
+            At inference, dynamics are computed only for representative Gaussians at each
+            object's geometric centroid. Motion is rigidly propagated to all other Gaussians
+            via translation and rotation of precomputed canonical offsets, preserving
+            inter-point distances.
+          </p>
+          <span class="contrib-tag">~11 FPS speedup</span>
+        </div>
+
+        <div class="contrib-card">
+          <div class="contrib-number">C3</div>
+          <h3>Open-Vocabulary Querying</h3>
+          <p>
+            An offline CLIP-based lookup table stores text-aligned embeddings for each object
+            group. Natural language prompts retrieve Gaussian subsets via cosine similarity,
+            enabling selective rendering and scene editing without retraining.
+          </p>
+          <span class="contrib-tag">zero-shot retrieval</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Results ===== -->
+  <section class="section" id="results">
+    <div class="container">
+      <div class="section-header">
+        <h2>Results</h2>
+        <p class="text-secondary">Quantitative and qualitative evaluation on the Dynamic Indoor Scene dataset.</p>
+      </div>
+
+      <!-- Video embed placeholder -->
+      <div class="video-placeholder">
+        <div class="play-icon">&#9654;</div>
+        <span>Video demo &mdash; coming soon</span>
+      </div>
+
+      <h3>Qualitative Results</h3>
+
+      <figure class="pipeline-figure">
+        <img src="images/grounding_example.png"
+             alt="Open-vocabulary object retrieval and semantic segmentation with R5DGS"
+             loading="lazy">
+        <figcaption>R5DGS enables open-vocabulary object retrieval from natural language prompts via CLIP-based embedding lookup, supporting selective rendering and scene editing without retraining.</figcaption>
+      </figure>
+
+      <!-- Metrics tables -->
+      <h3>Reconstruction Quality &amp; Speed</h3>
+
+      <h4 class="text-secondary">Novel View Synthesis across 4 scenes (extrapolation)</h4>
+      <div class="metrics-table-wrap">
+        <table class="metrics-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th colspan="3">Dining Table</th>
+              <th colspan="3">Chessboard</th>
+              <th colspan="3">Darkroom</th>
+              <th colspan="3">Factory</th>
+            </tr>
+            <tr>
+              <th></th>
+              <th>PSNR&uarr;</th><th>SSIM&uarr;</th><th>LPIPS&darr;</th>
+              <th>PSNR&uarr;</th><th>SSIM&uarr;</th><th>LPIPS&darr;</th>
+              <th>PSNR&uarr;</th><th>SSIM&uarr;</th><th>LPIPS&darr;</th>
+              <th>PSNR&uarr;</th><th>SSIM&uarr;</th><th>LPIPS&darr;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="method-name">TRACE</td>
+              <td>35.580</td><td>0.962</td><td>0.050</td>
+              <td>34.630</td><td>0.963</td><td>0.055</td>
+              <td>37.774</td><td>0.961</td><td>0.067</td>
+              <td>36.488</td><td>0.965</td><td>0.049</td>
+            </tr>
+            <tr>
+              <td class="method-name">5DGS (Ours)</td>
+              <td>35.428</td><td>0.956</td><td>0.055</td>
+              <td>33.991</td><td>0.956</td><td>0.063</td>
+              <td>36.600</td><td>0.955</td><td>0.074</td>
+              <td>35.926</td><td>0.958</td><td>0.055</td>
+            </tr>
+            <tr>
+              <td class="method-name">R5DGS (Ours)</td>
+              <td>28.844</td><td>0.942</td><td>0.066</td>
+              <td>28.805</td><td>0.932</td><td>0.086</td>
+              <td>31.181</td><td>0.939</td><td>0.091</td>
+              <td>29.798</td><td>0.924</td><td>0.075</td>
+            </tr>
+            <tr>
+              <td class="method-name">R5DGS w/ extra loss (Ours)</td>
+              <td>28.688</td><td>0.939</td><td>0.067</td>
+              <td>29.153</td><td>0.929</td><td>0.089</td>
+              <td>31.537</td><td>0.943</td><td>0.087</td>
+              <td>30.749</td><td>0.928</td><td>0.073</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="text-secondary">Segmentation Accuracy &amp; Frame Rate per scene</h4>
+      <div class="metrics-table-wrap">
+        <table class="metrics-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th colspan="2">Dining Table</th>
+              <th colspan="2">Chessboard</th>
+              <th colspan="2">Darkroom</th>
+              <th colspan="2">Factory</th>
+              <th colspan="2">Overall</th>
+            </tr>
+            <tr>
+              <th></th>
+              <th>FPS&uarr;</th><th>mIoU&uarr;</th>
+              <th>FPS&uarr;</th><th>mIoU&uarr;</th>
+              <th>FPS&uarr;</th><th>mIoU&uarr;</th>
+              <th>FPS&uarr;</th><th>mIoU&uarr;</th>
+              <th>FPS&uarr;</th><th>mIoU&uarr;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="method-name">5DGS</td>
+              <td>66.9</td><td class="best">0.78</td>
+              <td>67.3</td><td class="best">0.75</td>
+              <td>49.4</td><td>0.37</td>
+              <td>64.9</td><td class="best">0.47</td>
+              <td>62.1</td><td>0.59</td>
+            </tr>
+            <tr>
+              <td class="method-name">R5DGS</td>
+              <td class="best">76.3</td><td>0.77</td>
+              <td class="best">76.9</td><td>0.73</td>
+              <td class="best">66.2</td><td class="best">0.38</td>
+              <td class="best">75.0</td><td>0.46</td>
+              <td class="best">73.6</td><td>0.59</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-small text-secondary">
+        Metrics per scene on the Dynamic Indoor Scene dataset. FPS measured on NVIDIA RTX 4090.
+        R5DGS achieves a consistent ~11 FPS speedup over 5DGS across all scenes while maintaining mIoU.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== BibTeX ===== -->
+  <section class="section" id="bibtex">
+    <div class="container">
+      <div class="section-header">
+        <h2>BibTeX</h2>
+      </div>
+      <div class="bib-block">
+        <button class="bib-copy-btn" id="bibCopyBtn">Copy</button>
+        <pre>@misc{gridusov2025r5dgs,
+  title={R5DGS: Semantic-Aware 4D Gaussian Splatting with Rigid Body Constraints for Efficient Dynamic Scene Reconstruction},
+  author={Denis Gridusov and Maxim Popov and Sergey Kolyubin},
+  year={2025},
+  eprint={2605.25909},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV}
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Related Work ===== -->
+  <!-- <section class="section" id="related">
+    <div class="container">
+      <div class="section-header">
+        <h2>Related Work</h2>
+      </div>
+      <div class="related-grid">
+        <div class="related-card">
+          <span class="venue-tag">CVPR 2023</span>
+          <h3>3D Gaussian Splatting for Real-Time Radiance Field Rendering</h3>
+          <p>Kerbl et al. introduce explicit 3D Gaussian representation with fast differentiable rasterization, forming the backbone representation of our work.</p>
+          <a class="related-link" href="https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/" target="_blank" rel="noopener">Read paper &rarr;</a>
+        </div>
+        <div class="related-card">
+          <span class="venue-tag">arXiv 2025</span>
+          <h3>TRACE: Physics-Informed 4D Gaussian Splatting</h3>
+          <p>Li et al. model temporal dynamics via deformation fields and translation-rotation dynamics modules for extrapolation. R5DGS extends TRACE with semantic grouping and rigid-body constraints.</p>
+          <a class="related-link" href="https://arxiv.org/abs/2503.00000" target="_blank" rel="noopener">Read paper &rarr;</a>
+        </div>
+        <div class="related-card">
+          <span class="venue-tag">CVPR 2024</span>
+          <h3>Gaussian Grouping: Segment and Edit Anything in 3D Scenes</h3>
+          <p>Ye et al. augment 3D Gaussians with identity encodings for open-world 3D segmentation. We adopt their identity encoding formulation for 4D dynamic scenes.</p>
+          <a class="related-link" href="https://ymq2017.github.io/gaussian-grouping/" target="_blank" rel="noopener">Read paper &rarr;</a>
+        </div>
+        <div class="related-card">
+          <span class="venue-tag">ICML 2021</span>
+          <h3>Learning Transferable Visual Models From Natural Language Supervision</h3>
+          <p>Radford et al. introduce CLIP, a vision-language model that aligns images and text in a shared embedding space. We use CLIP-based embeddings for open-vocabulary object retrieval.</p>
+          <a class="related-link" href="https://github.com/openai/CLIP" target="_blank" rel="noopener">Read paper &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+  <!-- ===== Footer ===== -->
+  <footer>
+    <div class="container">
+      <span>&copy; 2025 BE2R Lab, ITMO University</span>
+      <!-- <span>Built with <a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a></span> -->
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
