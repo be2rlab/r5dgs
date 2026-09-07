@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>R5DGS: Semantic-Aware 4D Gaussian Splatting with Rigid Body Constraints</title>
-  <meta name="description" content="R5DGS extends physics-informed 4D Gaussian Splatting with instance-level semantics and rigid-body constrained extrapolation, achieving 11 FPS speedup for dynamic scene reconstruction.">
+  <title>FastR-4DGS: Accelerated Spatio-Temporal Gaussian Rendering via Kinematic and Semantic Priors</title>
+  <meta name="description" content="FastR-4DGS extends physics-informed 4D Gaussian Splatting with instance-level semantics and rigid-body constrained extrapolation, achieving 11 FPS speedup for dynamic scene reconstruction.">
   <meta name="keywords" content="4D Gaussian Splatting, semantic segmentation, rigid body constraints, dynamic scene reconstruction, open-vocabulary grounding">
 
   <!-- Fonts -->
@@ -17,7 +17,7 @@
   {
     "@context": "https://schema.org",
     "@type": "ScholarlyArticle",
-    "headline": "R5DGS: Semantic-Aware 4D Gaussian Splatting with Rigid Body Constraints for Efficient Dynamic Scene Reconstruction",
+    "headline": "FastR-4DGS: Accelerated Spatio-Temporal Gaussian Rendering via Kinematic and Semantic Priors",
     "description": "We extend physics-informed 4D Gaussian Splatting with instance-level semantics and rigid-body constrained extrapolation, achieving a consistent ~11 FPS speedup on NVIDIA RTX 4090 while preserving physically plausible motion.",
     "author": [
       {"@type": "Person", "name": "Denis Gridusov", "affiliation": "ITMO University"},
@@ -37,7 +37,7 @@
   <!-- ===== Nav ===== -->
   <nav>
     <div class="container">
-      <span class="nav-brand">R5DGS</span>
+      <span class="nav-brand">FastR-4DGS</span>
       <ul class="nav-links">
         <li><a href="#abstract">Abstract</a></li>
         <li><a href="#method">Method</a></li>
@@ -56,7 +56,7 @@
     <div class="container">
       <div class="hero-content">
         <div class="venue-badge">ICRA 2026 Workshop on Semantics for Reliable Robot Autonomy</div>
-        <h1>R5DGS: Semantic-Aware 4D Gaussian Splatting<br>with Rigid Body Constraints for Efficient Dynamic Scene Reconstruction</h1>
+        <h1>FastR-4DGS: Accelerated Spatio-Temporal Gaussian Rendering<br>via Kinematic and Semantic Priors</h1>
         <p class="hero-authors">
           <span>Denis Gridusov, Maxim Popov, Sergey Kolyubin</span>
           <span class="affiliation">BE2R Lab, ITMO University</span>
@@ -69,9 +69,9 @@
       </div>
       <figure class="hero-teaser">
         <img src="images/hero_teaser.png"
-             alt="Scene examples from the Dynamic Indoor Scene dataset with R5DGS reconstructions across Dining Table, Chessboard, Darkroom, and Factory scenes"
+             alt="Scene examples from the Dynamic Indoor Scene dataset with FastR-4DGS reconstructions across Dining Table, Chessboard, Darkroom, and Factory scenes"
              loading="lazy">
-        <figcaption>R5DGS reconstruction across four Dynamic Indoor Scene environments. Each column shows a different scene with R5DGS rendered RGB (top) and semantic segmentation (bottom).</figcaption>
+        <figcaption>FastR-4DGS reconstruction across four Dynamic Indoor Scene environments. Each column shows a different scene with FastR-4DGS rendered RGB (top) and semantic segmentation (bottom).</figcaption>
       </figure>
     </div>
   </header>
@@ -85,7 +85,7 @@
       <div class="abstract-grid">
         <div class="abstract-text">
           <p>
-            We present R5DGS, a framework that extends physics-informed 4D Gaussian Splatting
+            We present FastR-4DGS, a framework that extends physics-informed 4D Gaussian Splatting
             with instance-level semantics and rigid-body constrained extrapolation for efficient
             dynamic scene reconstruction. Our method augments each Gaussian with a compact
             learnable identity vector, enabling discrete object grouping without 3D annotations.
@@ -134,14 +134,14 @@
     <div class="container">
       <div class="section-header">
         <h2>Method</h2>
-        <p class="text-secondary">R5DGS builds on TRACE with identity-augmented Gaussians, rigid-body constrained extrapolation, and a CLIP-based open-vocabulary retrieval pipeline.</p>
+        <p class="text-secondary">FastR-4DGS builds on TRACE with identity-augmented Gaussians, rigid-body constrained extrapolation, and a CLIP-based open-vocabulary retrieval pipeline.</p>
       </div>
 
       <figure class="pipeline-figure">
         <img src="images/pipeline.png"
-             alt="R5DGS pipeline: multi-view video to identity-augmented 4D Gaussians through rigid-body extrapolation"
+             alt="FastR-4DGS pipeline: multi-view video to identity-augmented 4D Gaussians through rigid-body extrapolation"
              loading="lazy">
-        <figcaption>R5DGS pipeline overview. Multi-view RGB videos are represented as identity-augmented 4D Gaussians. Identity encoding guided by SAM2+DEVA semantic masks. Rigid-body extrapolation propagates dynamics from representative Gaussians (9-12 per object) to the full set, reducing inference cost from O(N) to O(K).</figcaption>
+        <figcaption>FastR-4DGS pipeline overview. Multi-view RGB videos are represented as identity-augmented 4D Gaussians. Identity encoding guided by SAM2+DEVA semantic masks. Rigid-body extrapolation propagates dynamics from representative Gaussians (9-12 per object) to the full set, reducing inference cost from O(N) to O(K).</figcaption>
       </figure>
 
       <div class="contrib-grid">
@@ -200,9 +200,9 @@
 
       <figure class="pipeline-figure">
         <img src="images/grounding_example.png"
-             alt="Open-vocabulary object retrieval and semantic segmentation with R5DGS"
+             alt="Open-vocabulary object retrieval and semantic segmentation with FastR-4DGS"
              loading="lazy">
-        <figcaption>R5DGS enables open-vocabulary object retrieval from natural language prompts via CLIP-based embedding lookup, supporting selective rendering and scene editing without retraining.</figcaption>
+        <figcaption>FastR-4DGS enables open-vocabulary object retrieval from natural language prompts via CLIP-based embedding lookup, supporting selective rendering and scene editing without retraining.</figcaption>
       </figure>
 
       <!-- Metrics tables -->
@@ -243,14 +243,14 @@
               <td>35.926</td><td>0.958</td><td>0.055</td>
             </tr>
             <tr>
-              <td class="method-name">R5DGS (Ours)</td>
+              <td class="method-name">FastR-4DGS (Ours)</td>
               <td>28.844</td><td>0.942</td><td>0.066</td>
               <td>28.805</td><td>0.932</td><td>0.086</td>
               <td>31.181</td><td>0.939</td><td>0.091</td>
               <td>29.798</td><td>0.924</td><td>0.075</td>
             </tr>
             <tr>
-              <td class="method-name">R5DGS w/ extra loss (Ours)</td>
+              <td class="method-name">FastR-4DGS w/ extra loss (Ours)</td>
               <td>28.688</td><td>0.939</td><td>0.067</td>
               <td>29.153</td><td>0.929</td><td>0.089</td>
               <td>31.537</td><td>0.943</td><td>0.087</td>
@@ -291,7 +291,7 @@
               <td>62.1</td><td>0.59</td>
             </tr>
             <tr>
-              <td class="method-name">R5DGS</td>
+              <td class="method-name">FastR-4DGS</td>
               <td class="best">76.3</td><td>0.77</td>
               <td class="best">76.9</td><td>0.73</td>
               <td class="best">66.2</td><td class="best">0.38</td>
@@ -304,7 +304,7 @@
 
       <p class="text-small text-secondary">
         Metrics per scene on the Dynamic Indoor Scene dataset. FPS measured on NVIDIA RTX 4090.
-        R5DGS achieves a consistent ~11 FPS speedup over 5DGS across all scenes while maintaining mIoU.
+        FastR-4DGS achieves a consistent ~11 FPS speedup over 5DGS across all scenes while maintaining mIoU.
       </p>
     </div>
   </section>
@@ -317,8 +317,8 @@
       </div>
       <div class="bib-block">
         <button class="bib-copy-btn" id="bibCopyBtn">Copy</button>
-        <pre>@article{gridusov2026r5dgs,
-  title={R5DGS: Semantic-Aware 4D Gaussian Splatting with Rigid Body Constraints for Efficient Dynamic Scene Reconstruction},
+        <pre>@article{gridusov2026fastr4dgs,
+  title={FastR-4DGS: Accelerated Spatio-Temporal Gaussian Rendering via Kinematic and Semantic Priors},
   author={Gridusov, Denis and Popov, Maxim and Kolyubin, Sergey},
   journal={arXiv preprint arXiv:2605.25909},
   year={2026}
@@ -343,7 +343,7 @@
         <div class="related-card">
           <span class="venue-tag">arXiv 2025</span>
           <h3>TRACE: Physics-Informed 4D Gaussian Splatting</h3>
-          <p>Li et al. model temporal dynamics via deformation fields and translation-rotation dynamics modules for extrapolation. R5DGS extends TRACE with semantic grouping and rigid-body constraints.</p>
+          <p>Li et al. model temporal dynamics via deformation fields and translation-rotation dynamics modules for extrapolation. FastR-4DGS extends TRACE with semantic grouping and rigid-body constraints.</p>
           <a class="related-link" href="https://arxiv.org/abs/2503.00000" target="_blank" rel="noopener">Read paper &rarr;</a>
         </div>
         <div class="related-card">
